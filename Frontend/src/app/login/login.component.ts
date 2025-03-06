@@ -4,6 +4,7 @@ import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set } from "firebase/database";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from "firebase/auth";
 import { Route, Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,7 @@ export class LoginComponent {
   isLogin: boolean = true
 
   firebaseConfig = {
-    apiKey: "AIzaSyBZ8CYtyp5jeDCZ1us73wKTKP-tMggQI9k",
+    apiKey: environment.apiFirebaseKey,
     authDomain: "mylist-47c5d.firebaseapp.com",
     databaseURL: "https://mylist-47c5d-default-rtdb.firebaseio.com",
     projectId: "mylist-47c5d",
