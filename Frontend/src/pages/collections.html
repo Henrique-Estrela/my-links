@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Coleções</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .collection-item {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin-left: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        input {
+            padding: 5px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gerenciar Coleções</h1>
+
+    <div id="collections-container"></div>
+
+    <!-- Formulário para adicionar/editar coleções -->
+    <h3>Adicionar/Editar Coleção</h3>
+    <input type="hidden" id="collectionId"> <!-- Não visível -->
+    <input type="text" id="collectionName" placeholder="Nome da coleção" required>
+    <input type="hidden" id="userId"> <!-- Definido automaticamente pelo Firebase -->
+    <input type="hidden" id="createdAt"> <!-- Definido automaticamente na criação -->
+    <textarea id="links" placeholder="Links da coleção (separados por vírgula)"></textarea> <!-- Para adicionar links -->
+    <button id="addCollectionBtn">Adicionar Coleção</button>
+    <button id="editCollectionBtn">Editar Coleção</button>
+
+    <script type="module">
+        // Inicialização Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
+        import { getDatabase, ref, get, set, push, remove, update } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZ8CYtyp5jeDCZ1us73wKTKP-tMggQI9k",
+            authDomain: "mylist-47c5d.firebaseapp.com",
+            databaseURL: "https://mylist-47c5d-default-rtdb.firebaseio.com",
+            projectId: "mylist-47c5d",
+            storageBucket: "mylist-47c5d.firebasestorage.app",
+            messagingSenderId: "788524449781",
+            appId: "1:788524449781:web:02f8905320a4c8c956eabc",
+            measurementId: "G-N2E344W9V4"
+        };
+
+        // Inicializando o Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+
+        let userId = null;
+
+        // Verifica o estado de autenticação do usuário
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                userId = user.uid; // Define o userId como o ID do usuário autenticado
+                document.getElementById('userId').value = userId;  // Preenche o userId no campo oculto
+                loadCollections();  // Carregar coleções após o usuário estar autenticado
+            } else {
+                alert("Você precisa estar autenticado para gerenciar coleções.");
+            }
+        });
+
+        // Função para carregar as coleções
+        function loadCollections() {
+            const collectionsContainer = document.getElementById('collections-container');
+            collectionsContainer.innerHTML = ''; // Limpa o conteúdo atual
+
+            const collectionsRef = ref(database, 'collections');
+            get(collectionsRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    snapshot.forEach((collectionSnapshot) => {
+                        const collection = collectionSnapshot.val();
+                        const collectionId = collectionSnapshot.key;
+
+                        const collectionElement = document.createElement('div');
+                        collectionElement.classList.add('collection-item');
+
+                        const nameElement = document.createElement('h3');
+                        nameElement.textContent = collection.name;
+
+                        const editButton = document.createElement('button');
+                        editButton.textContent = 'Editar';
+                        editButton.onclick = () => {
+                            document.getElementById("collectionId").value = collectionId;
+                            document.getElementById("collectionName").value = collection.name;
+                            document.getElementById("links").value = collection.links.join(', '); // Exibe os links separados por vírgula
+                        };
+
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Deletar';
+                        deleteButton.onclick = () => {
+                            if (confirm('Tem certeza que deseja deletar esta coleção?')) {
+                                deleteCollection(collectionId);
+                            }
+                        };
+
+                        collectionElement.appendChild(nameElement);
+                        collectionElement.appendChild(editButton);
+                        collectionElement.appendChild(deleteButton);
+
+                        collectionsContainer.appendChild(collectionElement);
+                    });
+                } else {
+                    collectionsContainer.innerHTML = 'Nenhuma coleção encontrada.';
+                }
+            }).catch((error) => {
+                console.error("Erro ao carregar coleções: ", error);
+                alert('Erro ao carregar coleções: ' + error.message);
+            });
+        }
+
+        // Função para adicionar uma nova coleção
+        function addCollection() {
+            const collectionName = document.getElementById('collectionName').value;
+            const links = document.getElementById('links').value.split(',').map(link => link.trim()); // Processa os links
+            const createdAt = new Date().toISOString();
+            const userId = document.getElementById('userId').value;
+            
+
+            if (!userId) {
+                alert("Você precisa estar autenticado para adicionar coleções.");
+                return;
+            }
+
+            if (collectionName) {
+                const newCollectionId = push(ref(database, 'collections')).key; // Gera um ID único para a coleção
+                const collectionData = {
+                    userId: userId,
+                    name: collectionName,
+                    createdAt: createdAt,
+                    links: links
+                };
+
+                const collectionRef = ref(database, 'collections/' + newCollectionId);
+                set(collectionRef, collectionData)
+                    .then(() => {
+                        alert('Coleção adicionada com sucesso!');
+                        loadCollections();  // Recarrega as coleções
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao adicionar coleção: ", error);
+                        alert('Erro ao adicionar coleção: ' + error.message);
+                    });
+            } else {
+                alert('O nome da coleção é obrigatório.');
+            }
+        }
+
+        // Função para editar uma coleção
+        function editCollection() {
+            const collectionId = document.getElementById('collectionId').value;
+            const collectionName = document.getElementById('collectionName').value;
+            const links = document.getElementById('links').value.split(',').map(link => link.trim()); // Processa os links
+
+            if (collectionId && collectionName) {
+                const collectionRef = ref(database, 'collections/' + collectionId);
+                update(collectionRef, {
+                    name: collectionName,
+                    links: links
+                }).then(() => {
+                    alert('Coleção editada com sucesso!');
+                    loadCollections();  // Recarrega as coleções
+                }).catch((error) => {
+                    console.error("Erro ao editar coleção: ", error);
+                    alert('Erro ao editar coleção: ' + error.message);
+                });
+            } else {
+                alert('Por favor, preencha todos os campos.');
+            }
+        }
+
+        // Função para deletar uma coleção
+        function deleteCollection(collectionId) {
+            const collectionRef = ref(database, 'collections/' + collectionId);
+            remove(collectionRef).then(() => {
+                alert('Coleção deletada com sucesso!');
+                loadCollections();  // Recarrega as coleções
+            }).catch((error) => {
+                console.error("Erro ao deletar coleção: ", error);
+                alert('Erro ao deletar coleção: ' + error.message);
+            });
+        }
+
+        // Carregar as coleções ao carregar a página
+        window.onload = loadCollections;
+
+        // Event Listeners para os botões
+        document.getElementById('addCollectionBtn').addEventListener('click', addCollection);
+        document.getElementById('editCollectionBtn').addEventListener('click', editCollection);
+    </script>
+</body>
+</html>

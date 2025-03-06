@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciar Usuários</title>
+  <script type="module">
+    // Importando os SDKs necessários do Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js";
+    import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js";
+
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBZ8CYtyp5jeDCZ1us73wKTKP-tMggQI9k",
+      authDomain: "mylist-47c5d.firebaseapp.com",
+      databaseURL: "https://mylist-47c5d-default-rtdb.firebaseio.com",
+      projectId: "mylist-47c5d",
+      storageBucket: "mylist-47c5d.firebasestorage.app",
+      messagingSenderId: "788524449781",
+      appId: "1:788524449781:web:02f8905320a4c8c956eabc",
+      measurementId: "G-N2E344W9V4"
+    };
+
+    // Inicializando Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const auth = getAuth(app);
+
+    // Função para listar todos os usuários
+    async function listUsers() {
+      const usersRef = ref(db, 'user/');
+      const snapshot = await get(usersRef);
+      const usersList = snapshot.exists() ? snapshot.val() : {};
+
+      const usersContainer = document.getElementById('users-container');
+      usersContainer.innerHTML = ''; // Limpa a lista de usuários
+
+      for (let userId in usersList) {
+        const user = usersList[userId];
+        const userElement = document.createElement('div');
+        userElement.innerHTML = `
+          <h3>${user.email}</h3>
+          <p>ID: ${userId}</p>
+          <button onclick="editUser('${userId}')">Editar</button>
+          <button onclick="deleteUser('${userId}')">Excluir</button>
+        `;
+        usersContainer.appendChild(userElement);
+      }
+    }
+
+    // Função para adicionar um novo usuário
+    window.addUser = function() { // Tornando a função global
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const userId = Date.now().toString(); // Gerando um ID único (pode usar Firebase Auth para gerar UID)
+
+      if (email && password) {
+        set(ref(db, 'user/' + userId), {
+          email: email,
+          password: password,
+          createdAt: new Date().toISOString()
+        })
+        .then(() => {
+          alert('Usuário adicionado com sucesso!');
+          listUsers(); // Atualiza a lista de usuários
+        })
+        .catch((error) => {
+          alert('Erro ao adicionar usuário: ' + error.message);
+        });
+      } else {
+        alert('Preencha todos os campos');
+      }
+    }
+
+    // Função para editar um usuário
+    window.editUser = function(userId) { // Tornando a função global
+      const email = prompt('Digite o novo e-mail do usuário:');
+      const password = prompt('Digite a nova senha do usuário:');
+
+      if (email && password) {
+        set(ref(db, 'user/' + userId), {
+          email: email,
+          password: password,
+          createdAt: new Date().toISOString()
+        })
+        .then(() => {
+          alert('Usuário atualizado com sucesso!');
+          listUsers(); // Atualiza a lista de usuários
+        })
+        .catch((error) => {
+          alert('Erro ao atualizar usuário: ' + error.message);
+        });
+      } else {
+        alert('Preencha todos os campos');
+      }
+    }
+
+    // Função para excluir um usuário
+    window.deleteUser = function(userId) { // Tornando a função global
+      if (confirm('Tem certeza que deseja excluir este usuário?')) {
+        remove(ref(db, 'user/' + userId))
+        .then(() => {
+          alert('Usuário excluído com sucesso!');
+          listUsers(); // Atualiza a lista de usuários
+        })
+        .catch((error) => {
+          alert('Erro ao excluir usuário: ' + error.message);
+        });
+      }
+    }
+
+    // Função para registrar um usuário
+    window.registerUser = function() {
+      const email = document.getElementById('register-email').value;
+      const password = document.getElementById('register-password').value;
+
+      if (email && password) {
+        createUserWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            alert('Usuário registrado com sucesso!');
+            listUsers();
+          })
+          .catch((error) => {
+            alert('Erro ao registrar usuário: ' + error.message);
+          });
+      } else {
+        alert('Preencha todos os campos');
+      }
+    }
+
+    // Função para login de um usuário
+    window.loginUser = function() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+
+      if (email && password) {
+        signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            const user = userCredential.user;
+            alert('Login realizado com sucesso!');
+            listUsers();
+          })
+          .catch((error) => {
+            alert('Erro ao fazer login: ' + error.message);
+          });
+      } else {
+        alert('Preencha todos os campos');
+      }
+    }
+
+    // Função para logout do usuário
+    window.logoutUser = function() {
+      signOut(auth)
+        .then(() => {
+          alert('Logout realizado com sucesso!');
+        })
+        .catch((error) => {
+          alert('Erro ao fazer logout: ' + error.message);
+        });
+    }
+
+    // Monitora o estado de autenticação do usuário
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Usuário logado
+        document.getElementById('login-container').style.display = 'none';
+        document.getElementById('logout-container').style.display = 'block';
+      } else {
+        // Usuário não logado
+        document.getElementById('login-container').style.display = 'block';
+        document.getElementById('logout-container').style.display = 'none';
+      }
+    });
+
+    // Chama a função listUsers para exibir os usuários ao carregar a página
+    window.onload = listUsers;
+  </script>
+</head>
+<body>
+  <h1>Gerenciar Usuários</h1>
+
+  <!-- Formulário de login -->
+  <div id="login-container">
+    <h2>Login</h2>
+    <input type="email" id="login-email" placeholder="Email" required><br>
+    <input type="password" id="login-password" placeholder="Senha" required><br>
+    <button onclick="loginUser()">Login</button>
+  </div>
+
+  <!-- Formulário de registro -->
+  <div id="register-container">
+    <h2>Registrar Usuário</h2>
+    <input type="email" id="register-email" placeholder="Email" required><br>
+    <input type="password" id="register-password" placeholder="Senha" required><br>
+    <button onclick="registerUser()">Registrar</button>
+  </div>
+
+  <!-- Logout -->
+  <div id="logout-container" style="display: none;">
+    <button onclick="logoutUser()">Logout</button>
+  </div>
+
+  <!-- Formulário para adicionar um usuário -->
+  <div>
+    <h2>Adicionar Usuário</h2>
+    <input type="email" id="email" placeholder="Email do usuário" required><br>
+    <input type="password" id="password" placeholder="Senha do usuário" required><br>
+    <button onclick="addUser()">Adicionar Usuário</button>
+  </div>
+
+  <!-- Lista de usuários -->
+  <div id="users-container">
+    <!-- Os usuários serão listados aqui -->
+  </div>
+</body>
+</html>
