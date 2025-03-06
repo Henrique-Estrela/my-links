@@ -1,0 +1,79 @@
+<div class="parents">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="img-login">
+                    <img src="loginImg.png" alt="">
+                </div>
+            </div>
+            <div class="col-md-6">
+                    <div class="form-login">
+                        <h1>{{ isLogin ? 'Login' : 'Cadastro' }}</h1>
+                        @if (isLogin) {
+                            <h3>Não tem uma conta? <a (click)="toggleForm()">Crie sua conta.</a></h3>
+                        } @else {
+                            <h3>Já tem uma conta? <a (click)="toggleForm()">Faça seu Login.</a></h3>
+                        }
+                        <form>
+                            @if (isLogin) {
+                                <div class="input-box">
+                                    <input type="email" name="email" [(ngModel)]="loginObj.email" id="email" placeholder="Email" required>
+                                </div>
+                                <div class="input-box">
+                                    <input type="text" name="password" [(ngModel)]="loginObj.password" id="password" placeholder="Senha" required>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="checkbox" name="lembre-se" [(ngModel)]="loginObj.lembrar" id="lembrar">
+                                        <label for="lembre-se">Lembre de mim</label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <a href="">Esqueceu a senha?</a>
+                                    </div>
+                                </div>
+
+                                <button type="button" (click)="loginUser()" id="btnSubmit">Entrar</button>
+
+                            } @else {
+                                <div class="input-box">
+                                    <input type="text" name="user" [(ngModel)]="loginObj.UserId" id="user" placeholder="Usuario" required>
+                                </div>
+                                <div class="input-box">
+                                    <input type="email" name="email" [(ngModel)]="loginObj.email" id="email" placeholder="Email" required>
+                                </div>
+                                <div class="input-box">
+                                    <input type="text" name="password" [(ngModel)]="loginObj.password" id="password" placeholder="Senha" required>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="checkbox" name="lembre-se" [(ngModel)]="loginObj.lembrar" id="lembrar">
+                                        <label for="lembre-se">Lembre de mim</label>
+                                    </div>
+                                    <div class="col-md-6">
+                                    </div>
+                                </div>
+
+                                <button type="button" (click)="registerUser()" id="btnSubmit">Entrar</button>
+                            }
+    
+    
+                            <div class="row">
+                                <div class="col-md-5"><hr></div>
+                                <div class="col-md-2">ou</div>
+                                <div class="col-md-5"><hr></div>
+                            </div>
+    
+                            <div class="LogarFora">
+                                <button type="submit">Google</button>
+                                <button type="submit">Facebook</button>
+                            </div>
+                        </form>
+                    </div>
+                
+            </div>
+            
+        </div>
+    </div>
+</div>
