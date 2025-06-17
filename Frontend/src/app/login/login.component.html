@@ -1,18 +1,18 @@
 <div class="parents">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-6">
-                <div class="img-login">
-                    <img src="loginImg.png" alt="">
+            <div class="col-md-6 container-login">
+                <div class="">
+                    <img class="img-login" src="loginImg.png" alt="">
                 </div>
             </div>
             <div class="col-md-6">
                     <div class="form-login">
                         <h1>{{ isLogin ? 'Login' : 'Cadastro' }}</h1>
                         @if (isLogin) {
-                            <h3>Não tem uma conta? <a (click)="toggleForm()">Crie sua conta.</a></h3>
+                            <h3>Não tem uma conta? <a (click)="toggleForm()" class="subilinhar">Crie sua conta.</a></h3>
                         } @else {
-                            <h3>Já tem uma conta? <a (click)="toggleForm()">Faça seu Login.</a></h3>
+                            <h3>Já tem uma conta? <a (click)="toggleForm()" class="subilinhar">Faça seu Login.</a></h3>
                         }
                         <form>
                             @if (isLogin) {
@@ -24,20 +24,25 @@
                                 </div>
                                 
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <input type="checkbox" name="lembre-se" [(ngModel)]="loginObj.lembrar" id="lembrar">
-                                        <label for="lembre-se">Lembre de mim</label>
+                                    <div class="col-md-6 informativo">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" name="lembre-se" [(ngModel)]="loginObj.lembrar" id="lembrar" />
+                                            <span class="checkmark"></span>
+                                            Lembre de mim
+                                        </label>
                                     </div>
-                                    <div class="col-md-6">
-                                        <a href="">Esqueceu a senha?</a>
+                                    <div class="col-md-6 informativo esqueceu-senha">
+                                        <a href="" class="subilinhar">Esqueceu a senha?</a>
                                     </div>
                                 </div>
+                                <div class="btns">
+                                    <button type="button" (click)="loginUser()" id="btnSubmit">Entrar</button>
+                                </div>
 
-                                <button type="button" (click)="loginUser()" id="btnSubmit">Entrar</button>
 
                             } @else {
                                 <div class="input-box">
-                                    <input type="text" name="user" [(ngModel)]="loginObj.UserId" id="user" placeholder="Usuario" required>
+                                    <input type="text" name="name" [(ngModel)]="loginObj.name" id="name" placeholder="Usuario" required>
                                 </div>
                                 <div class="input-box">
                                     <input type="email" name="email" [(ngModel)]="loginObj.email" id="email" placeholder="Email" required>
@@ -47,27 +52,32 @@
                                 </div>
                                 
                                 <div class="row">
-                                    <div class="col-md-6">
-                                        <input type="checkbox" name="lembre-se" [(ngModel)]="loginObj.lembrar" id="lembrar">
-                                        <label for="lembre-se">Lembre de mim</label>
+                                    <div class="col-md-6 informativo">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" name="lembre-se" [(ngModel)]="loginObj.lembrar" id="lembrar" />
+                                            <span class="checkmark"></span>
+                                            Lembre de mim
+                                        </label>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6 informativo">
                                     </div>
                                 </div>
+                                <div class="btns" style="margin-top: 0 !important;">
+                                    <button type="button" (click)="registerUser()" id="btnSubmit" >Cadastrar</button>
+                                </div>
 
-                                <button type="button" (click)="registerUser()" id="btnSubmit">Entrar</button>
                             }
     
     
-                            <div class="row">
+                            <div class="row line">
                                 <div class="col-md-5"><hr></div>
-                                <div class="col-md-2">ou</div>
+                                <div class="col-md-2 line-text">ou</div>
                                 <div class="col-md-5"><hr></div>
                             </div>
     
                             <div class="LogarFora">
-                                <button type="submit">Google</button>
-                                <button type="submit">Facebook</button>
+                                <button type="submit"><img src="https://img.icons8.com/?size=512&id=17949&format=png" alt=""> Google</button>
+                                <button type="submit"><img src="https://cdn-icons-png.flaticon.com/256/124/124010.png" alt=""> Facebook</button>
                             </div>
                         </form>
                     </div>

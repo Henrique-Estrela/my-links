@@ -1,3 +1,186 @@
-body{
+.container-login {
+    height: 100vh;
+    width: 100%;
     background-color: #0B0B0B;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+.img-login {
+    width: 90% ;
+    object-fit: cover;
+}
+
+.form-login{
+    height: 100%;
+    padding: 1rem 3rem !important;
+}
+
+.form-login h1{
+    font-size: 5em;
+}
+.form-login h3{
+    font-size: 1.3em;
+    padding-left: 2rem !important;
+}
+
+.form-login input{
+    width: 90% !important;
+    height: 4rem;
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+    padding: 1rem !important;
+    border-radius: 0.5rem;
+    border: 2px solid #4A1434 !important;
+    font-size: 1.3em !important;
+
+}
+
+.form-login input::placeholder{
+    font-size: 1.1em !important;
+}
+
+.form-login input:focus{
+    border: 2px solid #987e8e !important;
+    outline: none !important;
+}
+
+.informativo{
+    height: 2rem;
+    padding:0 3rem !important;
+}
+
+.form-login input[type="checkbox"]{
+    width: auto !important;
+}
+
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+  font-size: 16px;
+}
+
+.custom-checkbox input {
+  opacity: 0;
+  position: absolute;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.input-box{
+    display: flex;
+    justify-content: center;
+}
+
+.custom-checkbox .checkmark {
+  height: 15px;
+  width: 15px;
+  border: 2px solid #0B0B0B;
+  border-radius: 50%;
+  margin-right: 8px;
+  position: relative;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-checkbox .checkmark::after {
+  content: '';
+  display: none;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.custom-checkbox input:checked + .checkmark {
+  background-color: #4A1434;
+}
+
+.custom-checkbox input:checked + .checkmark::after {
+  display: block;
+}
+
+.subilinhar{
+    cursor: pointer;
+    color: #4A1434 !important;
+    text-decoration: underline !important;
+}
+.subilinhar:hover{
+    color: #987e8e !important;
+}
+.esqueceu-senha{
+    display: flex;
+    align-items: center;
+    justify-content: end !important;
+}
+
+button{
+    width: 15rem;
+    height: 3.5rem;
+    gap: 1rem;
+    background-color: transparent;
+    color: #0b0b0bb0 ;
+    font-weight: bold;
+    font-size: 2.3em;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    border: 2px solid #0B0B0B !important;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+button:hover{
+    background-color: #987e8e !important;
+    color: #0B0B0B !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btns{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem !important;
+}
+.btns button{
+    background-color: #4A1434;
+    color: #fff;
+}
+
+.LogarFora{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+.LogarFora button{
+    padding-left: 1rem !important;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+
+}
+.LogarFora img{
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+}
+
+.line{
+    margin: 2rem 0;
+}
+
+.line-text{
+    text-align: center;
+    font-size: 1.5em;
+    color: #0B0B0B;
+}
+

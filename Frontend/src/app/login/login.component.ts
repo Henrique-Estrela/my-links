@@ -2,9 +2,18 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set } from "firebase/database";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, User } from "firebase/auth";
-import { Route, Router } from '@angular/router';
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile,
+  User
+} from "firebase/auth";
+import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +24,7 @@ import { environment } from '../../environments/environment';
 })
 export class LoginComponent {
   user: User | null = null;
-  isLogin: boolean = true
+  isLogin: boolean = true;
 
   firebaseConfig = {
     apiKey: environment.apiFirebaseKey,
@@ -34,90 +43,97 @@ export class LoginComponent {
 
   loginObj: Login;
 
-
   constructor(private router: Router) {
-    // Monitora o estado de autenticação
     onAuthStateChanged(this.auth, (user) => {
       this.user = user;
     });
+
     this.loginObj = new Login();
-
   }
+
   toggleForm() {
-    this.isLogin = !this.isLogin; // Alterna entre login e cadastro
+    this.isLogin = !this.isLogin;
+    this.loginObj = new Login(); // limpa os campos ao alternar
   }
 
-  // Registrar usuário
   registerUser() {
-    if (!this.loginObj.email || !this.loginObj.password) {
-      alert('Preencha todos os campos');
+    const { email, password, name } = this.loginObj;
+
+    if (!email || !password || !name) {
+      Swal.fire('Atenção', 'Preencha todos os campos', 'warning');
       return;
     }
 
-    createUserWithEmailAndPassword(this.auth, this.loginObj.email, this.loginObj.password)
+    createUserWithEmailAndPassword(this.auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
-        alert('Usuário registrado com sucesso!');
-        this.addUser(user);
+
+        // Atualiza o nome do usuário
+        return updateProfile(user, { displayName: name }).then(() => {
+          this.addUser(user);
+          Swal.fire('Sucesso!', 'Usuário registrado com sucesso!', 'success');
+        });
       })
       .catch((error) => {
-        alert('Erro ao registrar usuário: ' + error.message);
+        Swal.fire('Erro', 'Erro ao registrar usuário: ' + error.message, 'error');
       });
   }
 
-  // Adicionar usuário no Firebase Realtime Database
   addUser(user: User) {
     set(ref(this.db, 'users/' + user.uid), {
+      userId: user.uid,
+      name: user.displayName || 'Usuário sem nome',
       email: user.email,
       createdAt: new Date().toISOString()
     })
-    .then(() => {
-      alert('Usuário adicionado com sucesso!');
-    })
-    .catch((error) => {
-      alert('Erro ao adicionar usuário: ' + error.message);
-    });
-  }
-
-  // Login do usuário
-  loginUser() {
-    if (!this.loginObj.email || !this.loginObj.password) {
-      alert('Preencha todos os campos');
-      return;
-    }
-
-    signInWithEmailAndPassword(this.auth, this.loginObj.email, this.loginObj.password)
-      .then((userCredential) => {
-        alert('Login realizado com sucesso!');
-        this.router.navigate(['dashboard'])
+      .then(() => {
+        Swal.fire('Sucesso!', 'Usuário adicionado com sucesso!', 'success');
+        this.router.navigate(['dashboard']);
       })
       .catch((error) => {
-        alert('Erro ao fazer login: ' + error.message);
+        Swal.fire('Erro', 'Erro ao adicionar usuário: ' + error.message, 'error');
       });
   }
 
-  // Logout do usuário
+  loginUser() {
+    const { email, password } = this.loginObj;
+
+    if (!email || !password) {
+      Swal.fire('Atenção', 'Preencha todos os campos', 'warning');
+      return;
+    }
+
+    signInWithEmailAndPassword(this.auth, email, password)
+      .then(() => {
+        Swal.fire('Sucesso!', 'Login realizado com sucesso!', 'success');
+        this.router.navigate(['dashboard']);
+      })
+      .catch((error) => {
+        Swal.fire('Erro', 'Erro ao fazer login: ' + error.message, 'error');
+      });
+  }
+
   logoutUser() {
     signOut(this.auth)
       .then(() => {
-        alert('Logout realizado com sucesso!');
+        Swal.fire('Sucesso!', 'Logout realizado com sucesso!', 'success');
       })
       .catch((error) => {
-        alert('Erro ao fazer logout: ' + error.message);
+        Swal.fire('Erro', 'Erro ao fazer logout: ' + error.message, 'error');
       });
   }
 }
 
 export class Login {
-  UserId: string;
+  name: string;
   password: string;
   lembrar: boolean;
   email: string;
 
-  constructor(){
-    this.UserId = '';
+  constructor() {
+    this.name = '';
     this.password = '';
-    this.email = ''
+    this.email = '';
     this.lembrar = false;
   }
 }

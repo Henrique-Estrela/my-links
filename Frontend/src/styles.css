@@ -1,6 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+* {
+  margin: 0 ;
+  padding: 0 ;
+  font-family: "Acme", sans-serif;
+  color: #0B0B0B;
+  box-sizing: border-box;
+
+}
+
+
+.acme-regular {
+  font-family: "Acme", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
